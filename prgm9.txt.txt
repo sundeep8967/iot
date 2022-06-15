@@ -1,0 +1,41 @@
+// 
+// Smpl_GPIO_LED1 : GPC12--15  GPA 12_14 to control on-board LEDs
+//                  low-active output to control Red LEDs
+//
+#include <stdio.h>
+#include "NUC1xx.h"
+#include "Driver\DrvGPIO.h"
+
+#include "Driver\DrvSYS.h"
+
+
+void Init_LED() // Initialize GPIO pins
+{
+		DrvGPIO_Open(E_GPC, 12, E_IO_OUTPUT); // initial GPIO pin GPC12 for controlling LEd
+		while(1) 
+	{
+			DrvGPIO_ClrBit(E_GPC,12); // GPC12 = 0 to turn on LED
+			DrvSYS_Delay(100000);	    // Delay 
+			DrvGPIO_SetBit(E_GPC,12); // GPC12 = 1 to turn off LEd	
+			DrvSYS_Delay(100000);	    // Delay 		
+	} 	
+}
+
+int main (void)
+{
+	UNLOCKREG();			    // unlock register for programming
+        DrvSYS_Open(48000000);// set System Clock to run at 48MHz 
+	                      // 12MHz crystal input, PLL output 48MHz
+	LOCKREG();				    // lock register from programming
+
+  // Init_LED();        // Initialize LEDs (four on-board LEDs below LCD panel)
+	 //0 External Interrupt 
+  DrvGPIO_Open(E_GPB, 14, E_IO_INPUT);                             // configure external interrupt pin GPB14
+  DrvGPIO_EnableEINT1(E_IO_BOTH_EDGE, E_MODE_EDGE, Init_LED); // configure external interrupt
+
+  while(1)
+	{
+  }
+	
+
+}

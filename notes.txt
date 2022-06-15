@@ -1,0 +1,163 @@
+P2 and P5 Pending to do
+
+
+Note:P3 and P8 not there
+
+First download and extract nu140 zip
+
+Now open (Mu)Vision IDE
+
+Click on project and create a new project (do in edusample foler, not mandatory).
+
+Microcontroller name is the last one in 140 series of nuvoton.
+
+Add default source files required
+
+From CMSIS folder add
+core_cm0.c
+system_NUC1xx.c
+
+From source folder in nuvoton keil
+DrvGPIO
+DrvSYS
+
+--------------------------------------
+
+Program 1 getport.c
+
+Write the program. No changes here from the given manual code.
+
+Now save as a .c file. Add this file to the source group and also add lcd_driver and ascii table as well.
+
+For debugging and output goto
+Flash and configure with Nulink debugger.
+
+include the path 
+include
+include system
+include nu...
+
+Now flash it.
+
+Program 1 use a cable to ground and complete circuit between Ground and A0 to A8
+---------------------
+Program 2
+
+
+
+----------------------
+Program 4 Setport using interrupt
+
+Same code as in the manual.
+
+Flash and run the code.
+
+When the button below reset is pressed, An interrupt is triggered which is then handled by blinking the 4 onboard LEDs
+
+-----------------------
+Program 5
+
+
+-----------------------
+Program 6 Smpl_LCD with interrupt
+
+To program 4 clear Init_LED function
+
+add these 6lines inside instead
+Initial_panel(); 
+clr_all_panel();
+print_lcd(0, "Smpl_LCD_Text   ");	  
+print_lcd(1, "Nu-LB-NUC140    ");
+print_lcd(2, "Test LCD Display");
+print_lcd(3, "Nuvoton NuMicro ");
+
+Add LCD_Driver.h as a header.
+
+Add LCD_Driver and ascii table to source 
+
+----------------------------
+Program 7 buzzer using interrupt
+
+To program clear Init_LED function and add these lines
+
+DrvGPIO_Open(E_GPB, 11, E_IO_OUTPUT); // initial GPIO pin GPB11 for controlling Buzzer
+	while(1) 
+	{
+			DrvGPIO_ClrBit(E_GPB,11); // GPB11 = 0 to turn on Buzzer
+			DrvSYS_Delay(100000);	    // Delay 
+			DrvGPIO_SetBit(E_GPB,11); // GPB11 = 1 to turn off Buzzer	
+			DrvSYS_Delay(100000);	    // Delay 		
+	} 
+
+------------------------------
+Program 9 
+
+Use Program 4 itself as the base prgm
+
+DrvGPIO_Open(E_GPB, 14, E_IO_INPUT); instead of the usual 15 give 14. So now GPB14 is the interrupt pin.
+
+in init LED clear it and add code to make one led blink
+
+DrvGPIO_Open(E_GPC, 12, E_IO_OUTPUT); //GPC12 LED
+	{
+			DrvGPIO_ClrBit(E_GPC,12); // GPC12 = 0 to turn on LED
+			DrvSYS_Delay(100000);	    // Delay 
+			DrvGPIO_SetBit(E_GPC,12); // GPC12 = 1 to turn off LEd	
+			DrvSYS_Delay(100000);	    // Delay 		
+	} 
+
+Now flash the code.
+
+if a wire is connected between GPB14 and ground interrupt is triggered and Init_LED function is executed.
+
+----------------------------------
+
+Program 10 RGB led using interrupt
+
+Program 4 is base change the init_led function as follows 
+
+// initialize GPIO pins
+	DrvGPIO_Open(E_GPA, 12, E_IO_OUTPUT); // GPA12 pin set to output mode
+	DrvGPIO_Open(E_GPA, 13, E_IO_OUTPUT); // GPA13 pin set to output mode
+	DrvGPIO_Open(E_GPA, 14, E_IO_OUTPUT); // GPA14 pin set to output mode
+	// set GPIO pins output Hi to disable LEDs
+	DrvGPIO_SetBit(E_GPA, 12); // GPA12 pin output Hi to turn off Blue  LED
+	DrvGPIO_SetBit(E_GPA, 13); // GPA13 pin output Hi to turn off Green LED
+	DrvGPIO_SetBit(E_GPA, 14); // GPA14 pin output Hi to turn off Red   LED
+	
+		while (1)
+	{		 
+	// GPA12 = Blue,  0 : on, 1 : off
+	// GPA13 = Green, 0 : on, 1 : off
+	// GPA14 = Red,   0 : on, 1 : off
+
+	// set RGBled to Blue
+    DrvGPIO_ClrBit(E_GPA,12); // GPA12 = Blue,  0 : on, 1 : off
+    DrvGPIO_SetBit(E_GPA,13); 
+    DrvGPIO_SetBit(E_GPA,14); 
+	DrvSYS_Delay(1000000); 		   
+
+	// set RGBled to Green
+    DrvGPIO_SetBit(E_GPA,12); 
+    DrvGPIO_ClrBit(E_GPA,13); // GPA13 = Green, 0 : on, 1 : off
+    DrvGPIO_SetBit(E_GPA,14); 
+	DrvSYS_Delay(1000000);			  
+
+	// set RGBled to Red
+    DrvGPIO_SetBit(E_GPA,12); 
+    DrvGPIO_SetBit(E_GPA,13); 
+    DrvGPIO_ClrBit(E_GPA,14); // GPA14 = Red,   0 : on, 1 : off
+	DrvSYS_Delay(1000000);			  
+	
+	// set RGBled to off	 
+    DrvGPIO_SetBit(E_GPA,12); // GPA12 = Blue,  0 : on, 1 : off
+    DrvGPIO_SetBit(E_GPA,13); // GPA13 = Green, 0 : on, 1 : off
+    DrvGPIO_SetBit(E_GPA,14); // GPA14 = Red,   0 : on, 1 : off
+	DrvSYS_Delay(1000000);
+
+	}
+
+
+-----------------------------------
+
+Program 11 Raspberry PI
